@@ -1,38 +1,54 @@
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import axiosInstance from "../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm();
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   const onSubmit = async (data) => {
     setLoading(true);
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      if (res.success == true) {
+      console.log("response from server", res);
+      if (res.data?.success == true) {
         setLoading(false);
+        toast.success("Sign up successfull");
+        navigate("/verify-otp");
       } else {
         setLoading(false);
-        setError("Signup failed. Please try again.");
+        setError("backendResponse", {
+          message: "Login failed",
+        });
       }
     } catch (error) {
       setLoading(false);
-      setError(error.message || "Something went wrong.");
+      setError("email", {
+        message: error.response?.data?.message,
+      });
     }
   };
 
+  // Reusable input class — dark bg + visible text + matching border
+  const inputClass =
+    "w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-800 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900/40 transition";
+
+  const iconClass =
+    "absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500";
+
   return (
     <div>
-      <h1 className="text-xl font-semibold text-gray-900 mb-1">
+      <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">
         Create account
       </h1>
-      <p className="text-sm text-gray-400 mb-5">
+      <p className="text-sm text-gray-400 dark:text-gray-500 mb-5">
         Fill in your details to get started
       </p>
 
@@ -40,7 +56,7 @@ const Signup = () => {
         {/* Name */}
         <div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className={iconClass}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-4 h-4"
@@ -59,7 +75,7 @@ const Signup = () => {
             <input
               type="text"
               placeholder="Full name"
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
+              className={inputClass}
               {...register("name", { required: "Name is required" })}
             />
           </div>
@@ -73,7 +89,7 @@ const Signup = () => {
         {/* Email */}
         <div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className={iconClass}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-4 h-4"
@@ -92,7 +108,7 @@ const Signup = () => {
             <input
               type="email"
               placeholder="Email address"
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
+              className={inputClass}
               {...register("email", { required: "Email is required" })}
             />
           </div>
@@ -106,7 +122,7 @@ const Signup = () => {
         {/* Mobile */}
         <div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className={iconClass}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-4 h-4"
@@ -125,7 +141,7 @@ const Signup = () => {
             <input
               type="text"
               placeholder="Mobile number"
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
+              className={inputClass}
               {...register("mobileNo", {
                 required: "Mobile number is required",
                 pattern: {
@@ -145,7 +161,7 @@ const Signup = () => {
         {/* DOB */}
         <div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className={iconClass}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-4 h-4"
@@ -163,7 +179,7 @@ const Signup = () => {
             </span>
             <input
               type="date"
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
+              className={inputClass}
               {...register("dob", { required: "Date of birth is required" })}
             />
           </div>
@@ -177,7 +193,7 @@ const Signup = () => {
         {/* Location */}
         <div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span className={iconClass}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-4 h-4"
@@ -201,20 +217,18 @@ const Signup = () => {
             <input
               type="text"
               placeholder="Location (optional)"
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
+              className={inputClass}
               {...register("location")}
             />
           </div>
         </div>
-
-        {error && <p className="text-red-500 text-xs text-center">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
           className={`w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 ${
             loading
-              ? "bg-violet-400 cursor-not-allowed text-white"
+              ? "bg-violet-400 cursor-not-allowed text-white".email
               : "bg-violet-600 hover:bg-violet-700 text-white active:scale-95"
           }`}
         >
@@ -246,6 +260,8 @@ const Signup = () => {
           )}
         </button>
       </form>
+      {errors && <p>{errors.bacckendResponse}</p>}
+      <ToastContainer />
     </div>
   );
 };

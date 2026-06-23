@@ -7,29 +7,29 @@ import ThemeToggle from "../context/ThemeToggle";
 
 const Login = () => {
   const [tab, setTab] = useState("login");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm();
 
+  async function handleGenerateOtp() {}
   const onSubmit = async (data) => {
     setLoading(true);
     try {
       const res = await axiosInstance.post("/auth/login", data);
       if (res.success == true) {
         setLoading(false);
-        navigate("/chat");
-      } else {
-        setLoading(false);
-        setError("Login failed. Please try again.");
+        navigate("/verify-otp");
       }
     } catch (error) {
       setLoading(false);
-      setError(error.message || "Something went wrong.");
+      setError("email", {
+        message: error.response?.data?.message,
+      });
     }
   };
 
@@ -127,7 +127,7 @@ const Login = () => {
                     </svg>
                   </span>
                   <input
-                    type="text"
+                    type="email"
                     placeholder="Email or mobile number"
                     className="w-full pl-9 pr-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-800 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900/40 transition"
                     {...register("email", {
@@ -135,18 +135,10 @@ const Login = () => {
                     })}
                   />
                 </div>
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1.5 ml-1">
-                    {errors.email.message}
-                  </p>
-                )}
               </div>
 
-              {error && (
-                <p className="text-red-500 text-xs text-center">{error}</p>
-              )}
-
               <button
+                onClick={handleGenerateOtp}
                 disabled={loading}
                 type="submit"
                 className={`w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 ${
@@ -183,6 +175,11 @@ const Login = () => {
                 )}
               </button>
             </form>
+            {errors.email && (
+              <p className="text-red-500 text-center text-xs mt-1.5 ml-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
         ) : (
           <Signup />

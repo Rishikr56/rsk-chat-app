@@ -1,13 +1,24 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import axiosInstance from "../api/axiosInstance";
+import { useEffect, useState } from "react";
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
+  const [data, setData] = useState();
+  const navigate = useNavigate();
+  useEffect(() => {
+    async function getMe(params) {
+      const res = await axiosInstance.get("/auth/me");
+      setData(res.data);
+    }
 
-  if (!token) {
-    return <Navigate to="/" replace />;
+    getMe();
+  }, []);
+
+  if (data?.success) {
+    return children;
+  } else {
+    navigate("/");
   }
-
-  return children;
 };
 
 export default ProtectedRoute;
