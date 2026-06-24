@@ -21,7 +21,7 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      if (res.success == true) {
+      if (res.data?.success) {
         setLoading(false);
         navigate("/verify-otp");
       }
